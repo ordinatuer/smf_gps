@@ -15,6 +15,9 @@ services:
     volumes:
       - /var/www/vendor
       - ./../:/var/www
+    networks:
+      smf_net:
+        ipv4_address: 10.20.0.2
 
   nginx:
     container_name: smf_nginx
@@ -26,6 +29,9 @@ services:
       - ..:/var/www:rw
     depends_on:
       - php-fpm
+    networks:
+      smf_net:
+        ipv4_address: 10.20.0.3
     
   postgres:
     container_name: smf_postgres
@@ -39,6 +45,17 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - db_data:/var/lib/postgresql/data:rw
+    networks:
+      smf_net:
+        ipv4_address: 10.20.0.4
+
+networks:
+  smf_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.20.0.0/16
+          gateway: 10.20.0.1
 
 volumes:
   db_data:

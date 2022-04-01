@@ -4,7 +4,7 @@ doctrine:
         # either here or in the DATABASE_URL env var (see .env file)
         server_version: '13'
         driver: 'postgresql'
-        url: 'postgresql://smf_gps_user:smfgpspassword@172.20.0.2:5432/smf_gps_db?serverVersion=13&charset=utf8'
+        url: 'postgresql://smf_gps_user:smfgpspassword@10.20.0.4:5432/smf_gps_db?serverVersion=13&charset=utf8'
         types:
             point: 'App\geo\Types\PointType'
     orm:
