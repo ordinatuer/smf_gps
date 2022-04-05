@@ -11,12 +11,12 @@ class PointType extends Type
 {
     const POINT = 'point';
 
-    public function getName()
+    public function getName():string
     {
         return self::POINT;
     }
 
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform):string
     {
         return 'POINT';
     }
