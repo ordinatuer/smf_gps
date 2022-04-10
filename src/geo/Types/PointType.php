@@ -21,7 +21,7 @@ class PointType extends Type
         return 'POINT';
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform)
+    public function convertToPHPValue($value, AbstractPlatform $platform):Point
     {
         list($longitude, $latitude) = sscanf($value, 'point(%f, %f)');
 
