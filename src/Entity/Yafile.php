@@ -8,6 +8,15 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: YafileRepository::class)]
 class Yafile
 {
+    /**
+     * defult value for status
+     */
+    const LOAD_NOT_PARSED = 1;
+    const LOAD_PARSED = 2;
+    const LOAD_PARSE_IN_PROGRESS = 3;
+    const LOAD_LOST = 4;
+    const PARSE_ERROR = 5;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -21,6 +30,9 @@ class Yafile
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $description;
+
+    #[ORM\Column(type: 'smallint')]
+    private $status;
 
     public function getId(): ?int
     {
@@ -59,6 +71,18 @@ class Yafile
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getStatus(): ?int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(int $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }
