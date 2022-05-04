@@ -35,22 +35,22 @@ class Corruption
     #[ORM\Column(type: 'string', length: 128, nullable: true)]
     private $address_street;
 
-    #[ORM\Column(type: 'string', length: 32, nullable: true)]
+    #[ORM\Column(type: 'string', length: 128, nullable: true)]
     private $address_house;
 
-    #[ORM\Column(type: 'string', length: 32, nullable: true)]
+    #[ORM\Column(type: 'string', length: 128, nullable: true)]
     private $address_entrance;
 
-    #[ORM\Column(type: 'string', length: 32, nullable: true)]
+    #[ORM\Column(type: 'string', length: 128, nullable: true)]
     private $address_floor;
 
-    #[ORM\Column(type: 'string', length: 32, nullable: true)]
+    #[ORM\Column(type: 'string', length: 128, nullable: true)]
     private $address_office;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private $address_comment;
 
-    #[ORM\Column(type: 'string', length: 32, nullable: true)]
+    #[ORM\Column(type: 'string', length: 128, nullable: true)]
     private $address_doorcode;
 
     #[ORM\Column(type: 'point', nullable: true)]

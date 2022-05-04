@@ -11,25 +11,40 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 use Doctrine\Persistence\ManagerRegistry;
-//use App\Entity\Names;
+
+use App\Service\YafileParser;
 
 #[AsCommand(
-    name: 'Parse',
-    description: 'Add a short description for your command',
+    name: 'parse',
+    description: 'Ya .csv parser',
 )]
 class ParseCommand extends Command
 {
+    private ManagerRegistry $doctrine;
+    private YafileParser $parser;
+
+    public function __construct(ManagerRegistry $doctrine, YafileParser $parser)
+    {
+        $this->doctrine = $doctrine;
+        $this->parser = $parser;
+
+        parent::__construct();
+    }
     protected function configure(): void
     {
+        /*
         $this
             ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
             ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
         ;
+        */
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output, ManagerRegistry $doctrine): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+
+        /*
         $arg1 = $input->getArgument('arg1');
 
         if ($arg1) {
@@ -39,12 +54,16 @@ class ParseCommand extends Command
         if ($input->getOption('option1')) {
             // ...
         }
+        */
 
-        //$names = $doctrine->getRepository(Names::class)->findAll();
+        $print = [];
 
-        //print_r($names);
+        $io->success('BEGIN');
+        $print = $this->parser->yafiles();
 
-        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+        $io->listing($print);
+
+        $io->success('END ' );
 
         return Command::SUCCESS;
     }
