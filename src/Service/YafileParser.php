@@ -57,7 +57,7 @@ class YafileParser
     public function readFile(Yafile $file)
     {
         try {
-            $filename = $this->directory .'/test/test_' . $file->getName();
+            $filename = $this->directory . '/' . $file->getName();
             if (!file_exists($filename)) {
                 throw new \Exception('File not found');
             }
