@@ -10,7 +10,11 @@
 
 <div class="example-wrapper">
     {% for file in list %}
-        {{file.description}} <br> {{file.added|date('Y-m-d H:i:s')}} <br> {{file.name}} <hr>
+        {{file.description}} <br> {{file.added|date('Y-m-d H:i:s')}} <br> {{file.name}} <br>
+        {% if file.status == 2 %}
+            <b>&#10004;</b>
+        {% endif %}
+        <hr>
     {% endfor %}
 </div>
 {% endblock %}

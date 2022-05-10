@@ -12,13 +12,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 class YafileParser
 {
     const EXT_CSV = '.csv';
-
-//    private string $directory;
-//    private ManagerRegistry $doctrine;
-
-//    private int $writeRows;
-//    private int $insertedRows;
-//    private int $totalTime;
+    const SEPARATOR_CSV = ',';
 
     public function __construct(
         private string $directory,
@@ -26,16 +20,8 @@ class YafileParser
 
         private int $writeRows = 100,
         private int $insertedRows = 0,
-        private int $totalTime = 0
-    )
-    {
-//        $this->directory = $directory;
-//        $this->doctrine = $doctrine;
-
-//        $this->writeRows = 100;
-//        $this->insertedRows = 0;
-//        $this->totalTime = 0;
-    }
+        private int $totalTime = 0,
+    ) {}
 
     public function getFilesList(): array
     {
@@ -56,29 +42,32 @@ class YafileParser
      */
     public function readFile(Yafile $file)
     {
+        $manager = $this->doctrine->getManager();
+
         try {
+            $_status = 0;
+
             $filename = $this->directory . '/' . $file->getName();
             if (!file_exists($filename)) {
+                $_status = Yafile::LOAD_LOST;
                 throw new \Exception('File not found');
             }
 
             $fp = fopen($filename,'r');
-
             if (!$fp) {
+                $_status = Yafile::FILE_OPEN_ERROR;
                 throw new \Exception('File open error');
             }
         } catch (\Exception $fe) {
+            $file->setStatus($_status);
+            $manager->flush();
+
             return $filename . ' ' . $fe->getMessage() . " --- FILE OPEN ERROR  --- \n";
         }
 
-
-        $manager = $this->doctrine->getManager();
-
         if ($fp) {
             // .CSV headers
-            $row = fgets($fp);
-
-            $row_buffer = '';
+            $row = fgetcsv($fp, separator: self::SEPARATOR_CSV);
 
             $file->setStatus(Yafile::LOAD_PARSE_IN_PROGRESS);
             $manager->flush();
@@ -95,55 +84,31 @@ class YafileParser
             // ######################################################
 
             // построчное чтение
-            while( ($row = fgets($fp) ) !== false) {
-                // переносы строки в данных, заключенных в кавычки " ... \n ... "
-                // ..., ...," ...\n <---
-                // ..., ..., ...,\n <---
-                // ... ", ..., ...
-                if ( ((substr_count($row, '"') % 2) === 1) OR ('' !== $row_buffer) ) {
-                    $row_buffer .= $row;
-                }
+            while( ($row = fgetcsv($fp, separator: self::SEPARATOR_CSV) ) !== false) {
+                $i++;
 
-                // ..., ...," ...\n
-                // ..., ..., ...,\n
-                // ... ", ..., ... <---
-                // OR
-                // ..., ..., ..., ...
-                // OR
-                // ..., ..., "...", ..., "..."
-                if (('' != $row_buffer) AND ((substr_count($row_buffer, '"') % 2)) === 0 ) {
-                    $row = $row_buffer;
-                    $row_buffer = '';
-                }
+                $manager->persist( $this->setCorruption($row) );
 
-                if ('' == $row_buffer) {
-                    $i++;
+                if ($this->writeRows < $i) {
+                    $i = 0;
+                    $manager->flush();
+                    $manager->clear();
 
-                    $cols = $this->explodeString($row);
+                    // ###################################
+                    $this->insertedRows += $this->writeRows;
 
-                    $manager->persist( $this->setCorruption($cols) );
-                    
-                    if ($this->writeRows < $i) {
-                        $i = 0;
-                        $manager->flush();
-                        $manager->clear();
+                    $time = time() - $this->totalTime;
+                    $time_str = $time . ' sec';
 
-                        // ###################################
-                        $this->insertedRows += $this->writeRows;
+                    if (60 < $time) {
+                        $sec = $time % 60;
+                        $min = ($time - $sec) / 60;
 
-                        $time = time() - $this->totalTime;
-                        $time_str = $time . ' sec';
-
-                        if (60 < $time) {
-                            $sec = $time % 60;
-                            $min = ($time - $sec) / 60;
-
-                            $time_str = $min . ' min ' . $sec . ' sec';
-                        }
-                        // ######################################
-
-                        print($this->insertedRows . ' | ' . $time_str . " ---------------------------- \n");
+                        $time_str = $min . ' min ' . $sec . ' sec';
                     }
+                    // ######################################
+
+                    //print($this->insertedRows . ' | ' . $time_str . " ---------------------------- \n");
                 }
             }
 
@@ -207,37 +172,6 @@ class YafileParser
         $entity->setStatus($status);
 
         return $entity;
-    }
-
-    /**
-     * нарезка строки по столбцам с учётом данных в двойных кавычках
-     */
-    private function explodeString(string $string):array
-    {
-        $replaced = '||REPLACED||';
-        $string = str_replace('""', "'", $string);
-
-        preg_match_all('/"([^"]+)"/', $string, $matches);
-
-        // замена вместе с кавычками
-        if (0 < count($matches[0]) ) {
-            foreach($matches[0] as $match) {
-                $string = str_replace($match, $replaced, $string);
-            }
-        }
-
-        $data = explode(',', $string);
-
-        // запись данных без кавычек
-        if (0 < count($matches[1]) ) {
-            foreach($data as $key => $value) {
-                if ($value == $replaced) {
-                    $data[$key] = array_shift($matches[1]);
-                }
-            }
-        }
-
-        return $data;
     }
 
     /**

@@ -9,13 +9,14 @@ use Doctrine\ORM\Mapping as ORM;
 class Yafile
 {
     /**
-     * defult value for status
+     * @defult value for status
      */
     const LOAD_NOT_PARSED = 1;
     const LOAD_PARSED = 2;
     const LOAD_PARSE_IN_PROGRESS = 3;
     const LOAD_LOST = 4;
     const PARSE_ERROR = 5;
+    const FILE_OPEN_ERROR = 6;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
