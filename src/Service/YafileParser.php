@@ -94,21 +94,7 @@ class YafileParser
                     $manager->flush();
                     $manager->clear();
 
-                    // ###################################
                     $this->insertedRows += $this->writeRows;
-
-                    $time = time() - $this->totalTime;
-                    $time_str = $time . ' sec';
-
-                    if (60 < $time) {
-                        $sec = $time % 60;
-                        $min = ($time - $sec) / 60;
-
-                        $time_str = $min . ' min ' . $sec . ' sec';
-                    }
-                    // ######################################
-
-                    //print($this->insertedRows . ' | ' . $time_str . " ---------------------------- \n");
                 }
             }
 
@@ -119,7 +105,21 @@ class YafileParser
             $_file->setStatus(Yafile::LOAD_PARSED);
             $manager->flush();
 
-            print($this->insertedRows . '| '. $file->getId() . ' | ' . " ---  END FILE  ---------------------------- \n");
+            $time = time() - $this->totalTime;
+            $time_str = $time . ' sec';
+
+            if (60 < $time) {
+                $sec = $time % 60;
+                $min = ($time - $sec) / 60;
+
+                $time_str = $min . ' min ' . $sec . ' sec';
+            }
+
+            print(
+                $this->insertedRows . ' | ' .
+                //$file->getId() . ' | ' .
+                $time_str .
+                " ---  END FILE  ---------------------------- \n");
 
             fclose($fp);
         } else {
