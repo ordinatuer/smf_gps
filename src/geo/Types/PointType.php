@@ -28,7 +28,7 @@ class PointType extends Type
         return new Point($latitude, $longitude);
     }
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    public function convertToDatabaseValue($value, AbstractPlatform $platform):mixed
     {
         if ($value instanceof Point) {
             $value = sprintf('(%F, %F)', $value->getLongitude(), $value->getLatitude());
@@ -37,18 +37,8 @@ class PointType extends Type
         return $value;
     }
 
-    public function canRequireSQLConversion()
+    public function canRequireSQLConversion():bool
     {
         return true;
     }
-
-    // public function convertToPHPValueSQL($sqlExpr, AbstractPlatform $platform)
-    // {
-    //     return sprintf('AsText(%s)', $sqlExpr);
-    // }
-
-    // public function convertToDatabaseValueSQL($sqlExpr, AbstractPlatform $platform)
-    // {
-    //     return sprintf('PointFromText(%s)', $sqlExpr);
-    // }
 }

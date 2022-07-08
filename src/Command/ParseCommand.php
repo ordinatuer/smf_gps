@@ -20,14 +20,9 @@ use App\Service\YafileParser;
 )]
 class ParseCommand extends Command
 {
-    private ManagerRegistry $doctrine;
-    private YafileParser $parser;
-
-    public function __construct(ManagerRegistry $doctrine, YafileParser $parser)
-    {
-        $this->doctrine = $doctrine;
-        $this->parser = $parser;
-
+    public function __construct(
+        private YafileParser $parser,
+    ){
         parent::__construct();
     }
 

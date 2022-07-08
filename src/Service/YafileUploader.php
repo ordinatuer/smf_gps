@@ -1,18 +1,18 @@
 <?php
 namespace App\Service;
 
-use Symfony\Component\HttpFoundation\File\Esception\FileEsception;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 class YafileUploader
 {
-    private $directory;
-    private $slugger;
     private $errorMessage;
 
-    public function __construct(string $directory, SluggerInterface $slugger)
-    {
+    public function __construct(
+        private string $directory,
+        private SluggerInterface $slugger,
+    ){
         $this->directory = $directory;
         $this->slugger = $slugger;
     }

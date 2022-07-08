@@ -37,9 +37,6 @@ class YafileParser
         return $list;
     }
 
-    /**
-     * CSV не валидный, поэтому немного костылей 
-     */
     public function readFile(Yafile $file)
     {
         $manager = $this->doctrine->getManager();
