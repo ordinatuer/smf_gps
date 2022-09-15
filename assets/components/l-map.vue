@@ -1,11 +1,12 @@
 <template>
     <h4>{{title}}</h4>
     <span>Всего точек {{countPoints}}</span>
-    <div id="LMapInner"></div>
+    <div id="gpsMap"></div>
 </template>
 
 <script>
 import 'leaflet'
+import 'leaflet.markercluster'
 import axios from 'axios'
 
 export default {
@@ -16,7 +17,9 @@ export default {
             lng: 30.31413,
             zoom: 13,
             map: null,
-            countPoints: 0
+            countPoints: 0,
+            maxPointsCluster: 10000,
+            minPointsCluster: 1000
         }
     },
     mounted() {
@@ -30,29 +33,30 @@ export default {
         this.map.on('moveend', () => {
             this.getMapBounds()
         })
+
+        this.getMapBounds()
     },
     methods: {
         getMapBounds() {
             let bounds = this.map.getBounds()
             
             axios.post('/gpsmap-bounds', {
-                'side': 'client',
                 'bounds': bounds
             })
             .then((response) => {
-                this.countPoints = response.data.queryResult
+                let nPoints = response.data.n
+                this.countPoints = nPoints
+
+                if (this.maxPointsCluster < nPoints) {
+                    this.title = "Counted"
+                } else if (this.minPointsCluster < nPoints && nPoints < this.maxPointsCluster) {
+                    this.title = "Show Clusters"
+                } else {
+                    this.title = "Show Points"
+                }
             })
             .catch(function(error) {
                 console.log(error)
-            })
-            .then(function() {
-                console.log('Axios query sended')
-                console.log([
-                    bounds._northEast.lat,
-                    bounds._northEast.lng,
-                    bounds._southWest.lat,
-                    bounds._southWest.lng
-                ])
             })
         }
     }

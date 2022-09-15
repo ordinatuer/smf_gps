@@ -8,8 +8,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-use App\Repository\CorruptionRepository;
 use App\geo\Objects\Bounds;
+use App\Repository\PointsRepository;
 
 class GpsMapController extends AbstractController
 {
@@ -22,11 +22,11 @@ class GpsMapController extends AbstractController
     }
 
     #[Route('/gpsmap-bounds', name: 'app_gps_map_bounds', methods:"POST")]
-    public function getPointsInBounds(Request $request, CorruptionRepository $repository):JsonResponse {
+    public function getPointsInBounds(Request $request, PointsRepository $repository):JsonResponse {
         $bounds = $request->getContent();
         $bounds = json_decode($bounds)->bounds;
 
-        $queryResult = $repository->getCountByBounds(new Bounds(
+        $n = $repository->getCountByBounds(new Bounds(
             $bounds->_southWest->lat,
             $bounds->_southWest->lng,
             $bounds->_northEast->lat,
@@ -35,9 +35,8 @@ class GpsMapController extends AbstractController
 
         return $this->json([
             'success' => true,
-            'side' => 'server',
             'bounds' => $bounds,
-            'queryResult' => $queryResult,
+            'n' => $n,
         ]);
     }
 }
