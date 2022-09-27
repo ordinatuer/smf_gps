@@ -49,8 +49,46 @@ class PointsRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * [
+     *      count Points,
+     *      data | false
+     *      view as cluster
+     * ]
+     */
+    public function getInBounds(Bounds $bounds)
+    {
+        $_data = [
+            'count' => 0,
+            'data' => false,
+            'cluster' => false,
+        ];
+
+        $count = $this->getCountByBounds($bounds);
+        $_data['count'] = $count;
+
+        // только подсчёт количества точек
+        if (Bounds::MAX_POINTS_CLUSTER < $count) {
+            return $_data;
+        }
+
+        // данные о точках для кластеризованного (на клиенте) показа
+        if (Bounds::MIN_POINTS_CLUSTER < $count && $count < Bounds::MAX_POINTS_CLUSTER) {
+            $_data['cluster'] = true;
+        }
+
+        $_data['data'] = $this->getPointsByBounds($bounds);
+
+        return $_data;
+    }
+
+    /**
+     * Count points by Bounds
+     */
     public function getCountByBounds(Bounds $bounds)
     {
+        $sql = "select count(*) as count_id from %s where location <@ box(point(:x1,:y1),point(:x2,:y2))";
+
         $rsm = new ResultSetMapping;
 
         $rsm->addEntityResult('App\Entity\Points', 'c');
@@ -58,17 +96,42 @@ class PointsRepository extends ServiceEntityRepository
         $rsm->addFieldResult('c', 'location', 'location');
 
         $tableName = $this->_em->getClassMetadata(Points::class)->getTableName();
-
-        $sql = "select count(id) as count_id from " .$tableName. " where location <@ box(point(:x1,:y1),point(:x2,:y2))";
+        $sql = sprintf($sql, $tableName);
 
         $res = $this->_em->createNativeQuery($sql, $rsm)
-            ->setParameter('x1', $bounds->getSouthWestLat())
-            ->setParameter('y1', $bounds->getSouthWestLng())
-            ->setParameter('x2', $bounds->getNorthEastLat())
-            ->setParameter('y2', $bounds->getNorthEastLng())
-            ->getSingleScalarResult();
+            ->setParameters([
+                'x1' => $bounds->getSouthWestLat(),
+                'y1' => $bounds->getSouthWestLng(),
+                'x2' => $bounds->getNorthEastLat(),
+                'y2' => $bounds->getNorthEastLng(),
+            ]);
         
-        return $res;
+        return $res->getSingleScalarResult();
+    }
+
+    /**
+     * Points list by Bounds
+     */
+    public function getPointsByBounds(Bounds $bounds)
+    {
+        $tableName = $this->_em->getClassMetadata(Points::class)->getTableName();
+        $sql = "select id, location from ". $tableName ." where location <@ box(point(:x1,:y1),point(:x2,:y2))";
+
+        $rsm = new ResultSetMapping;
+
+        $rsm->addEntityResult('App\Entity\Points', 'c');
+        $rsm->addFieldResult('c', 'id', 'id');
+        $rsm->addFieldResult('c', 'location', 'location');
+
+        $res = $this->_em->createNativeQuery($sql, $rsm)
+            ->setParameters([
+                'x1' => $bounds->getSouthWestLat(),
+                'y1' => $bounds->getSouthWestLng(),
+                'x2' => $bounds->getNorthEastLat(),
+                'y2' => $bounds->getNorthEastLng(),
+            ]);
+
+        return $res->getArrayResult();
     }
 
     // /**

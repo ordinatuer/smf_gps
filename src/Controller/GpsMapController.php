@@ -26,7 +26,7 @@ class GpsMapController extends AbstractController
         $bounds = $request->getContent();
         $bounds = json_decode($bounds)->bounds;
 
-        $n = $repository->getCountByBounds(new Bounds(
+        $n = $repository->getInBounds(new Bounds(
             $bounds->_southWest->lat,
             $bounds->_southWest->lng,
             $bounds->_northEast->lat,
@@ -34,9 +34,10 @@ class GpsMapController extends AbstractController
         ));
 
         return $this->json([
-            'success' => true,
             'bounds' => $bounds,
-            'n' => $n,
+            'n' => $n['count'],
+            'data' => $n['data'],
+            'cluster' => $n['cluster'],
         ]);
     }
 }

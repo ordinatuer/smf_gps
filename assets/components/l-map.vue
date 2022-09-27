@@ -17,9 +17,7 @@ export default {
             lng: 30.31413,
             zoom: 13,
             map: null,
-            countPoints: 0,
-            maxPointsCluster: 10000,
-            minPointsCluster: 1000
+            countPoints: 0
         }
     },
     mounted() {
@@ -47,9 +45,9 @@ export default {
                 let nPoints = response.data.n
                 this.countPoints = nPoints
 
-                if (this.maxPointsCluster < nPoints) {
+                if (!response.data.data) {
                     this.title = "Counted"
-                } else if (this.minPointsCluster < nPoints && nPoints < this.maxPointsCluster) {
+                } else if (response.data.cluster) {
                     this.title = "Show Clusters"
                 } else {
                     this.title = "Show Points"

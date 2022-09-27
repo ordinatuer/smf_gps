@@ -3,6 +3,18 @@ namespace App\geo\Objects;
 
 class Bounds
 {
+    /**
+     * меньше - показ кластеризованных точек
+     * больше - только подсчет
+     */
+    const MAX_POINTS_CLUSTER = 10000;
+
+    /**
+     * меньше - показ отдельных точек
+     * больше - показ кластеризованных точек
+     */
+    const MIN_POINTS_CLUSTER = 1000;
+
     public function __construct(
         private float $southWestLat,
         private float $southWestLng,
