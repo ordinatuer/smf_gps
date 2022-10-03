@@ -74,6 +74,9 @@ class Corruption
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private $created_at;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $point_id;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -315,6 +318,18 @@ class Corruption
     public function setCreatedAt(?\DateTimeImmutable $created_at): self
     {
         $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getPointId(): ?int
+    {
+        return $this->point_id;
+    }
+
+    public function setPointId(?int $point_id): self
+    {
+        $this->point_id = $point_id;
 
         return $this;
     }

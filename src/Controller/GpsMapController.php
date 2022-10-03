@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 use App\geo\Objects\Bounds;
+use App\Repository\CorruptionRepository;
 use App\Repository\PointsRepository;
 
 class GpsMapController extends AbstractController
@@ -38,6 +39,18 @@ class GpsMapController extends AbstractController
             'n' => $n['count'],
             'data' => $n['data'],
             'cluster' => $n['cluster'],
+        ]);
+    }
+
+    #[Route('/gpsmap-point', name: 'app_gps_map_point', methods:"GET")]
+    public function getPointData(Request $request, CorruptionRepository $repository) {
+        $point_id = (int)$request->query->get('point_id');
+
+        $data = $repository->findOneBy(['point_id' => $point_id]);
+
+        return $this->json([
+            'data' => $data,
+            'point_id' => $point_id,
         ]);
     }
 }
