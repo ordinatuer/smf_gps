@@ -33,21 +33,36 @@ services:
       smf_net:
         ipv4_address: 10.20.0.3
     
-  postgres:
-    container_name: smf_postgres
+  # postgres:
+  #   container_name: smf_postgres
+  #   build:
+  #     context: ./postgres
+  #   ports:
+  #     - ${POSTGRES_PORT}:5432
+  #   environment:
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #   volumes:
+  #     - db_data:/var/lib/postgresql/data:rw
+  #   networks:
+  #     smf_net:
+  #       ipv4_address: 10.20.0.4
+  postgis:
+    container_name: smf_postgis
     build:
-      context: ./postgres
+      context: ./postgis
     ports:
-      - ${POSTGRES_PORT}:5432
+      - ${POSTGIS_PORT}:5432
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER$: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGIS_DB}
+      POSTGRES_USER: ${POSTGIS_USER}
+      POSTGRES_PASSWORD: ${POSTGIS_PASSWORD}
     volumes:
-      - db_data:/var/lib/postgresql/data:rw
+      - db_data_gis:/var/lib/postgresql/data:rw
     networks:
       smf_net:
-        ipv4_address: 10.20.0.4
+        ipv4_address: 10.20.0.6
   cache:
     container_name: smf_redis
     image: redis:latest
@@ -69,5 +84,5 @@ networks:
           gateway: 10.20.0.1
 
 volumes:
-  db_data:
-
+  # db_data:
+  db_data_gis:
