@@ -14,7 +14,7 @@ use App\Repository\PointsRepository;
 
 class GpsMapController extends AbstractController
 {
-    #[Route('/gpsmap', name: 'app_gps_map')]
+    #[Route('/', name: 'app_gps_map')]
     public function index(): Response
     {
         return $this->render('gps_map/index.html.twig', [

@@ -7,7 +7,7 @@
 <script>
 import 'leaflet'
 import 'leaflet.markercluster'
-import axios from 'axios'
+import {getPointData, getBoundsData} from './geo.js'
 
 export default {
     data() {
@@ -15,9 +15,10 @@ export default {
             title: 'Leaflet map in vue component',
             lat: 59.93863,
             lng: 30.31413,
-            zoom: 13,
+            zoom: 16,
             map: null,
-            countPoints: 0
+            countPoints: 0,
+            markers: false
         }
     },
     mounted() {
@@ -28,6 +29,15 @@ export default {
             attribution: '© OpenStreetMap'
         }).addTo(this.map)
 
+        this.markers = L.markerClusterGroup()
+        this.markers.on('click', (a) => {
+            const point = getPointData(a.layer._pid)
+
+            point
+                .then(result => console.log(result.data))
+                .catch(error => console.log(error))
+        })
+
         this.map.on('moveend', () => {
             this.getMapBounds()
         })
@@ -37,25 +47,40 @@ export default {
     methods: {
         getMapBounds() {
             let bounds = this.map.getBounds()
+            const boundsData = getBoundsData(bounds)
             
-            axios.post('/gpsmap-bounds', {
-                'bounds': bounds
-            })
-            .then((response) => {
-                let nPoints = response.data.n
-                this.countPoints = nPoints
+            boundsData
+                .then((response) => {
+                    let nPoints = response.data.n
+                    this.countPoints = nPoints
 
-                if (!response.data.data) {
-                    this.title = "Counted"
-                } else if (response.data.cluster) {
-                    this.title = "Show Clusters"
-                } else {
-                    this.title = "Show Points"
-                }
+                    if (!response.data.data) {
+                        this.title = "Counted"
+                    } else if (response.data.cluster) {
+                        this.title = "Show Clusters"
+                    } else {
+                        this.title = "Show Points"
+
+                        this._renderMarkers(response.data.data)
+                    }
+                })
+                .catch(function(error) {
+                    console.log(error)
+                })
+        },
+        _renderMarkers(data) {
+            let markerList = []
+
+            data.forEach((point) => {
+                const marker = L.marker([point.location.latitude, point.location.longitude]).bindPopup('Point ID:' + point.id)
+                marker._pid = point.id
+
+                markerList.push(marker)
             })
-            .catch(function(error) {
-                console.log(error)
-            })
+
+            this.markers.clearLayers()
+            this.markers.addLayers(markerList)
+            this.map.addLayer(this.markers)
         }
     }
 }

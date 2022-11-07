@@ -13,7 +13,7 @@ class Bounds
      * меньше - показ отдельных точек
      * больше - показ кластеризованных точек
      */
-    const MIN_POINTS_CLUSTER = 1000;
+    const MIN_POINTS_CLUSTER = 5000;
 
     public function __construct(
         private float $southWestLat,
