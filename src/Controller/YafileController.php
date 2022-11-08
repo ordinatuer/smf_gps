@@ -34,7 +34,9 @@ class YafileController extends AbstractController
                 $yafile->setAdded($time);
                 $yafile->setName($filename);
 
-                $doctrine->getRepository(Yafile::class)->add($yafile);
+                $manager = $doctrine->getManager();
+                $manager->persist($yafile);
+                $manager->flush();
             }
         }
 

@@ -38,18 +38,14 @@ class NamesController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            //$name = $form->getData();
             $nameName = $form->getData()->getName();
 
             $name->setName($nameName);
             $name->setLastname($form->getData()->getLastname());
 
-            $repository = $doctrine->getRepository(Names::class);
-            $repository->add($name);
-
-            // $manager = $doctrine->getManager();
-            // $manager->persist($name);
-            // $manager->flush();
+            $manager = $doctrine->getManager();
+            $manager->persist($name);
+            $manager->flush();
 
             return $this->redirectToRoute('app_allnames');
         }
