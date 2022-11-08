@@ -7,8 +7,12 @@ doctrine:
         url: 'postgresql://smf_gis_user:smfgispassword@10.20.0.6:5432/smf_gps_db?serverVersion=13&charset=utf8'
         types:
             point: 'App\geo\Types\PointType'
+            geometry: 'App\geo\Types\GeometryType'
+            geography: 'App\geo\Types\GeographyType'
         mapping_types:
             point: point
+            geometry: geometry
+            geography: geography
     orm:
         auto_generate_proxy_classes: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
