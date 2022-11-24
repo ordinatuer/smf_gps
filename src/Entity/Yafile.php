@@ -3,11 +3,19 @@
 namespace App\Entity;
 
 use App\Repository\YafileRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: YafileRepository::class)]
 class Yafile
 {
+    //FILE_TYPES['PROVIDERS_ADDRESS_LIST']
+    const FILE_TYPES = [
+        'YAFILE' => 1,
+        'PROVIDERS_ADDRESS_LIST' => 2,
+    ];
+
     /**
      * @defult value for status
      */
@@ -34,6 +42,20 @@ class Yafile
 
     #[ORM\Column(type: 'smallint')]
     private $status;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'yafiles')]
+    private $Yuser;
+
+    #[ORM\Column(type: 'integer', options: ['default' => 1])]
+    private $file_type = 1;
+
+    #[ORM\OneToMany(mappedBy: 'file', targetEntity: Address::class, orphanRemoval: true)]
+    private $addresses;
+
+    public function __construct()
+    {
+        $this->addresses = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -84,6 +106,60 @@ class Yafile
     public function setStatus(int $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getYuser(): ?User
+    {
+        return $this->Yuser;
+    }
+
+    public function setYuser(?User $Yuser): self
+    {
+        $this->Yuser = $Yuser;
+
+        return $this;
+    }
+
+    public function getFileType(): ?int
+    {
+        return $this->file_type;
+    }
+
+    public function setFileType(int $file_type): self
+    {
+        $this->file_type = $file_type;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Address>
+     */
+    public function getAddresses(): Collection
+    {
+        return $this->addresses;
+    }
+
+    public function addAddress(Address $address): self
+    {
+        if (!$this->addresses->contains($address)) {
+            $this->addresses[] = $address;
+            $address->setFile($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAddress(Address $address): self
+    {
+        if ($this->addresses->removeElement($address)) {
+            // set the owning side to null (unless already changed)
+            if ($address->getFile() === $this) {
+                $address->setFile(null);
+            }
+        }
 
         return $this;
     }

@@ -3,10 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\Yafile;
+use App\Service\YafileUploader;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * @method Yafile|null find($id, $lockMode = null, $lockVersion = null)
@@ -16,9 +18,21 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class YafileRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(
+        ManagerRegistry $registry,
+        private YafileUploader $yafileUploader,
+    )
     {
+        
         parent::__construct($registry, Yafile::class);
+    }
+
+    public function uploadAddress(UploadedFile $file, Yafile $address)
+    {
+        $filename = $this->yafileUploader->upload($file, YafileUploader::ADDRESS_DIR);
+        $address->setName($filename);
+
+        $this->add($address);
     }
 
     /**

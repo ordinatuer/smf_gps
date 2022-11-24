@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -33,6 +35,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'boolean')]
     private $isVerified = false;
+
+    #[ORM\OneToMany(mappedBy: 'Yuser', targetEntity: Yafile::class)]
+    private $yafiles;
+
+    public function __construct()
+    {
+        $this->yafiles = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -124,6 +134,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsVerified(bool $isVerified): self
     {
         $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Yafile>
+     */
+    public function getYafiles(): Collection
+    {
+        return $this->yafiles;
+    }
+
+    public function addYafile(Yafile $yafile): self
+    {
+        if (!$this->yafiles->contains($yafile)) {
+            $this->yafiles[] = $yafile;
+            $yafile->setYuser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeYafile(Yafile $yafile): self
+    {
+        if ($this->yafiles->removeElement($yafile)) {
+            // set the owning side to null (unless already changed)
+            if ($yafile->getYuser() === $this) {
+                $yafile->setYuser(null);
+            }
+        }
 
         return $this;
     }

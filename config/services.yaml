@@ -31,3 +31,11 @@ services:
     App\Service\YafileParser:
         arguments:
             $directory: '%upload_files%/yafiles'
+
+    App\Service\Geocode\YandexGeocode:
+        $client: '@Symfony\Contracts\HttpClient\HttpClientInterface'
+        $api_url: 'https://geocode-maps.yandex.ru/1.x/'
+        $api_key: 'c4bd694f-f7f3-47f5-bdc9-c3c42f39b83e'
+        $logger: '@Psr\Log\LoggerInterface'
+        # $format: 'json'
+        # $city: 'Санкт-Петербург'

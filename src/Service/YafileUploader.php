@@ -7,33 +7,39 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class YafileUploader
 {
-    private $errorMessage;
+    const ADDRESS_DIR = 'address';
+    
+    public $errorMessage;
 
     public function __construct(
         private string $directory,
         private SluggerInterface $slugger,
-    ){
-        $this->directory = $directory;
-        $this->slugger = $slugger;
-    }
+    ){}
 
-    public function upload(UploadedFile $file)
+    public function upload(UploadedFile $file, String $subDirectory = '')
     {
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $safeFilename = $this->slugger->slug($originalFilename);
-        $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
+        // $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
+        $newFilename = $safeFilename . '.' . $file->guessExtension();
     
         try {
-            $file->move($this->getDirectory(), $newFilename);
+            $file->move($this->getDirectory($subDirectory), $newFilename);
         } catch(FileException $fe) {
-            $errorMessage = $fe->getMessage();
+            $this->errorMessage = $fe->getMessage();
+
+            return false;
         }
 
         return $newFilename;
     }
 
-    public function getDirectory()
+    public function getDirectory(String $subDirectory = ''): String
     {
+        if ('' !== $subDirectory) {
+            return $this->directory . DIRECTORY_SEPARATOR . $subDirectory;
+        }
+
         return $this->directory;
     }
 }

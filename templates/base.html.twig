@@ -19,12 +19,16 @@
             <li><a href="/allnames">Allnames</a></li>
             <li><a href="/addname">Add new name</a></li>
             <li><a href="/yafile">File form</a></li>
+            <li><a href="/address_load">Address Upload</a></li>
             <li><a href="/yafileslist">Files list</a></li>
             <li><a href="/map">Gps Map</a></li>
             <hr />
             <li><a href="/">Регистрация</a></li>
         </ul>
         <div class="clearfix"></div>
+        <div class="example-wrapper">
+            {{app.request.get('_route')}}
+        </div>
         <hr >
         {% block body %}{% endblock %}
     </body>
