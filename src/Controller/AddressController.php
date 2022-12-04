@@ -12,9 +12,6 @@ use App\Entity\Yafile;
 use App\Form\AddressType;
 use App\Repository\YafileRepository;
 use App\Service\AddressService;
-use App\Service\YafileUploader;
-use App\Service\Exceptions\AddressServiceException;
-use ErrorException;
 
 class AddressController extends AbstractController
 {
@@ -38,7 +35,8 @@ class AddressController extends AbstractController
         $form = $this->createForm(AddressType::class, $address);
         $form->handleRequest($request);
 
-        $message = ' ---- ';
+        $message = '';
+        $stat = '';
 
         if ($form->isSubmitted() && $form->isValid()) {
             $file = $form->get('file')->getData();
@@ -54,16 +52,16 @@ class AddressController extends AbstractController
 
                 $yafileRepository->uploadAddress($file, $address);
 
-                $addressService->work($address);
+                $stat = $addressService->work($address);
                 
                 $message = $addressService->message;
             }
         }
 
         return $this->render('address/address.html.twig', [
-            'controller_name' => 'AddressController',
             'form' => $form->createView(),
             'message' => $message,
+            'stat' => $stat,
         ]);
     }
 }
