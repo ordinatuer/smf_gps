@@ -22,7 +22,6 @@ class AddressService
 
     public function __construct(
         private YafileUploader $yafileUploader,
-        private TokenStorageInterface $user,
         private AddressRepository $addressRepository,
         private YandexGeocode $geocode,
     )

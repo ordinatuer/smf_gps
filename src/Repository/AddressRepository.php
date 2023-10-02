@@ -45,6 +45,24 @@ class AddressRepository extends ServiceEntityRepository
         }
     }
 
+    public function getAddressList(int $fileId)
+    {
+        return $this->createQueryBuilder('a')
+            ->select('a.address', 'a.lon', 'a.lat', 'a.operator')
+            ->andWhere('a.file = :file_id')
+            ->setParameter('file_id', $fileId)
+            ->orderBy('a.id', 'ASC')
+            ->setMaxResults(30)
+            ->getQuery()
+            // ->getArrayResult()
+            ->getResult()
+        ;
+    }
+
+    public function getWaypointData()
+    {
+        
+    }
     // /**
     //  * @return Address[] Returns an array of Address objects
     //  */

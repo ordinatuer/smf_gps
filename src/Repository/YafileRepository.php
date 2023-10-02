@@ -59,6 +59,18 @@ class YafileRepository extends ServiceEntityRepository
         }
     }
 
+    public function findByUser($yuser)
+    {
+        return $this->createQueryBuilder('y')
+            ->andWhere('y.Yuser = :yuser')
+            ->setParameter('yuser', $yuser)
+            ->orderBy('y.id', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getArrayResult()
+        ;
+    }
+
     // /**
     //  * @return Yafile[] Returns an array of Yafile objects
     //  */

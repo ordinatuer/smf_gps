@@ -1,0 +1,15 @@
+body {
+    background-color: rgb(133, 186, 235);
+}
+ul.main-menu {
+    list-style-type: armenian;
+}
+.div-icon {
+    background:mediumblue;
+    border:5px solid rgba(255,255,255,0.5);
+    /* color:blue; */
+    font-weight:bold;
+    text-align:center;
+    border-radius:50%;
+    line-height:30px;
+}
